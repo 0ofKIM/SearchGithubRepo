@@ -87,8 +87,7 @@ enum SearchIntent: Equatable {
     case submitSearch
     case tapCancel
     case tapClearText
-    case tapRecentSearch(RecentSearchItem)
-    case tapAutocompleteSuggestion(RecentSearchItem)
+    case selectRecentSearch(RecentSearchItem)
     case removeRecentSearch(UUID)
     case clearAllRecentSearches
     case tapRepository(Repository)
@@ -141,20 +140,7 @@ final class SearchContainer: ObservableObject {
 
         case .submitSearch:
             let trimmedSearchText = state.searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard !trimmedSearchText.isEmpty else { return }
-            searchTask?.cancel()
-            paginationTask?.cancel()
-            state.activeSearchQuery = trimmedSearchText
-            state.searchFieldFocused = false
-            state.errorMessage = nil
-            state.presentedRepositoryWeb = nil
-            state.hasMorePages = false
-            nextPageToLoad = 2
-            recentSearchStorage.add(query: trimmedSearchText)
-            state.recentSearches = recentSearchStorage.load()
-            searchTask = Task { [weak self] in
-                await self?.performSearch(query: trimmedSearchText)
-            }
+            startSearch(with: trimmedSearchText)
 
         case .tapCancel:
             state.searchFieldFocused = false
@@ -169,27 +155,10 @@ final class SearchContainer: ObservableObject {
             state.presentedRepositoryWeb = nil
             paginationTask?.cancel()
 
-        case .tapRecentSearch(let recentSearchItem):
-            state.searchText = recentSearchItem.query
-            state.activeSearchQuery = nil
-            state.repositories = []
-            state.totalCount = 0
-            state.errorMessage = nil
-            state.hasMorePages = false
-            state.presentedRepositoryWeb = nil
-            state.searchFieldFocused = true
-            paginationTask?.cancel()
-
-        case .tapAutocompleteSuggestion(let recentSearchItem):
-            state.searchText = recentSearchItem.query
-            state.activeSearchQuery = nil
-            state.repositories = []
-            state.totalCount = 0
-            state.errorMessage = nil
-            state.hasMorePages = false
-            state.presentedRepositoryWeb = nil
-            state.searchFieldFocused = true
-            paginationTask?.cancel()
+        case .selectRecentSearch(let recentSearchItem):
+            let trimmedSearchText = recentSearchItem.query.trimmingCharacters(in: .whitespacesAndNewlines)
+            state.searchText = trimmedSearchText
+            startSearch(with: trimmedSearchText)
 
         case .removeRecentSearch(let recentSearchItemID):
             recentSearchStorage.remove(recentSearchItemID: recentSearchItemID)
@@ -217,6 +186,23 @@ final class SearchContainer: ObservableObject {
                 defer { self?.state.isPaginating = false }
                 await self?.loadNextPage()
             }
+        }
+    }
+    
+    private func startSearch(with trimmedQuery: String) {
+        guard !trimmedQuery.isEmpty else { return }
+        searchTask?.cancel()
+        paginationTask?.cancel()
+        state.activeSearchQuery = trimmedQuery
+        state.searchFieldFocused = false
+        state.errorMessage = nil
+        state.presentedRepositoryWeb = nil
+        state.hasMorePages = false
+        nextPageToLoad = 2
+        recentSearchStorage.add(query: trimmedQuery)
+        state.recentSearches = recentSearchStorage.load()
+        searchTask = Task { [weak self] in
+            await self?.performSearch(query: trimmedQuery)
         }
     }
 

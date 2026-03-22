@@ -169,7 +169,7 @@ struct SearchView: View {
         List {
             ForEach(state.autocompleteCandidates) { recentSearchItem in
                 Button {
-                    container.send(.tapAutocompleteSuggestion(recentSearchItem))
+                    container.send(.selectRecentSearch(recentSearchItem))
                 } label: {
                     HStack {
                         Text(recentSearchItem.query)
@@ -211,7 +211,7 @@ struct SearchView: View {
                         ForEach(state.recentSearchesDisplayed) { recentSearchItem in
                             HStack {
                                 Button {
-                                    container.send(.tapRecentSearch(recentSearchItem))
+                                    container.send(.selectRecentSearch(recentSearchItem))
                                 } label: {
                                     Text(recentSearchItem.query)
                                         .font(.body)
