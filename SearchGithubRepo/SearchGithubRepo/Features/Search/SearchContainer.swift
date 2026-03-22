@@ -38,10 +38,6 @@ struct SearchState: Equatable {
         }
     }
 
-    var showsLargeNavigationTitle: Bool {
-        !searchFieldFocused && searchText.isEmpty && activeSearchQuery == nil
-    }
-
     var showsRecentSection: Bool {
         activeSearchQuery == nil && searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }

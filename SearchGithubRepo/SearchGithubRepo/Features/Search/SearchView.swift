@@ -23,6 +23,13 @@ struct SearchView: View {
         return numberFormatter
     }()
 
+    /// 네비 타이틀과 같이 `searchFocused` 기준으로 큰 타이틀(.large) 표시 여부를 맞춤.
+    private var showsLargeNavigationTitle: Bool {
+        !searchFocused
+            && container.state.searchText.isEmpty
+            && container.state.activeSearchQuery == nil
+    }
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -45,7 +52,7 @@ struct SearchView: View {
             }
             .navigationTitle(searchFocused ? "" : "Search")
             .navigationBarTitleDisplayMode(
-                container.state.showsLargeNavigationTitle ? .large : .inline
+                showsLargeNavigationTitle ? .large : .inline
             )
             .onChange(of: searchFocused) { _, isSearchFieldFocused in
                 container.send(.searchFieldFocused(isSearchFieldFocused))
