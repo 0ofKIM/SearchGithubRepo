@@ -188,21 +188,11 @@ struct SearchView: View {
     @ViewBuilder
     private func recentSection(state: SearchState) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack {
-                Text("최근 검색")
-                    .font(.headline)
-                Spacer()
-                if !state.recentSearches.isEmpty {
-                    Button("전체삭제") {
-                        container.send(.clearAllRecentSearches)
-                    }
-                    .font(.subheadline)
-                    .foregroundStyle(Color.pink)
-                }
-            }
-            .padding(.horizontal, 16)
-            .padding(.top, 16)
-            .padding(.bottom, 8)
+            Text("최근 검색")
+                .font(.headline)
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
+                .padding(.bottom, 8)
 
             if state.recentSearches.isEmpty {
                 Text("최근 검색 내역이 없습니다.")
@@ -224,24 +214,37 @@ struct SearchView: View {
                                     container.send(.tapRecentSearch(recentSearchItem))
                                 } label: {
                                     Text(recentSearchItem.query)
+                                        .font(.body)
                                         .foregroundStyle(.primary)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
                                 }
                                 .buttonStyle(.plain)
 
                                 Button {
                                     container.send(.removeRecentSearch(recentSearchItem.id))
                                 } label: {
-                                    Image(systemName: "xmark")
-                                        .font(.caption.weight(.semibold))
+                                    Image(systemName: "xmark.circle.fill")
+                                        .font(.body.weight(.semibold))
                                         .foregroundStyle(.secondary)
                                         .padding(8)
                                 }
                                 .buttonStyle(.plain)
                             }
                             .padding(.horizontal, 16)
+                            .padding(.vertical, 5)
+                        }
+                        
+                        if !state.recentSearches.isEmpty {
+                            Button("전체삭제") {
+                                container.send(.clearAllRecentSearches)
+                            }
+                            .font(.subheadline)
+                            .foregroundStyle(Color.pink)
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            .padding(.horizontal, 16)
                             .padding(.vertical, 10)
                         }
+                        
+                        Divider()
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
