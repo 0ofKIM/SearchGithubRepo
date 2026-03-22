@@ -17,8 +17,8 @@ enum GitHubSearchError: LocalizedError {
             return "요청 주소가 올바르지 않습니다."
         case .invalidResponse:
             return "서버 응답을 해석할 수 없습니다."
-        case .httpStatus(let code):
-            return "GitHub API 오류 (코드 \(code))"
+        case .httpStatus(let statusCode):
+            return "GitHub API 오류 (코드 \(statusCode))"
         case .decoding:
             return "응답 데이터를 읽을 수 없습니다."
         }
@@ -44,12 +44,14 @@ actor GitHubSearchService {
         var request = URLRequest(url: url)
         request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
 
-        let (data, response) = try await session.data(for: request)
-        guard let http = response as? HTTPURLResponse else { throw GitHubSearchError.invalidResponse }
-        guard (200 ... 299).contains(http.statusCode) else { throw GitHubSearchError.httpStatus(http.statusCode) }
+        let (responseData, urlResponse) = try await session.data(for: request)
+        guard let httpURLResponse = urlResponse as? HTTPURLResponse else { throw GitHubSearchError.invalidResponse }
+        guard (200 ... 299).contains(httpURLResponse.statusCode) else {
+            throw GitHubSearchError.httpStatus(httpURLResponse.statusCode)
+        }
 
         do {
-            return try JSONDecoder().decode(SearchRepositoriesResponse.self, from: data)
+            return try JSONDecoder().decode(SearchRepositoriesResponse.self, from: responseData)
         } catch {
             throw GitHubSearchError.decoding(error)
         }

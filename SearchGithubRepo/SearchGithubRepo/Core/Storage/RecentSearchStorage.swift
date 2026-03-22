@@ -7,45 +7,45 @@ import Foundation
 
 struct RecentSearchStorage: Sendable {
     private let userDefaults: UserDefaults
-    private let key = "recentSearchItems"
+    private let userDefaultsKey = "recentSearchItems"
 
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
     }
 
     func load() -> [RecentSearchItem] {
-        guard let data = userDefaults.data(forKey: key) else { return [] }
+        guard let storedData = userDefaults.data(forKey: userDefaultsKey) else { return [] }
         do {
-            let decoded = try JSONDecoder().decode([RecentSearchItem].self, from: data)
-            return decoded.sorted { $0.searchedAt > $1.searchedAt }
+            let decodedItems = try JSONDecoder().decode([RecentSearchItem].self, from: storedData)
+            return decodedItems.sorted { $0.searchedAt > $1.searchedAt }
         } catch {
             return []
         }
     }
 
     func save(_ items: [RecentSearchItem]) {
-        let sorted = items.sorted { $0.searchedAt > $1.searchedAt }
-        let limited = Array(sorted.prefix(10))
-        guard let data = try? JSONEncoder().encode(limited) else { return }
-        userDefaults.set(data, forKey: key)
+        let sortedItems = items.sorted { $0.searchedAt > $1.searchedAt }
+        let limitedItems = Array(sortedItems.prefix(10))
+        guard let encodedData = try? JSONEncoder().encode(limitedItems) else { return }
+        userDefaults.set(encodedData, forKey: userDefaultsKey)
     }
 
     func add(query: String) {
-        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return }
-        var items = load()
-        items.removeAll { $0.query.caseInsensitiveCompare(trimmed) == .orderedSame }
-        items.append(RecentSearchItem(query: trimmed, searchedAt: .now))
-        save(items)
+        let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedQuery.isEmpty else { return }
+        var loadedItems = load()
+        loadedItems.removeAll { $0.query.caseInsensitiveCompare(trimmedQuery) == .orderedSame }
+        loadedItems.append(RecentSearchItem(query: trimmedQuery, searchedAt: .now))
+        save(loadedItems)
     }
 
-    func remove(id: UUID) {
-        var items = load()
-        items.removeAll { $0.id == id }
-        save(items)
+    func remove(recentSearchItemID: UUID) {
+        var loadedItems = load()
+        loadedItems.removeAll { $0.id == recentSearchItemID }
+        save(loadedItems)
     }
 
     func removeAll() {
-        userDefaults.removeObject(forKey: key)
+        userDefaults.removeObject(forKey: userDefaultsKey)
     }
 }

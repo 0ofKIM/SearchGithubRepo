@@ -10,25 +10,25 @@ struct SearchView: View {
     @FocusState private var searchFocused: Bool
 
     private static let shortDateFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.locale = Locale(identifier: "ko_KR")
-        f.dateFormat = "MM. dd."
-        return f
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "ko_KR")
+        dateFormatter.dateFormat = "MM. dd."
+        return dateFormatter
     }()
 
     private static let countFormatter: NumberFormatter = {
-        let n = NumberFormatter()
-        n.numberStyle = .decimal
-        n.locale = Locale(identifier: "ko_KR")
-        return n
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .decimal
+        numberFormatter.locale = Locale(identifier: "ko_KR")
+        return numberFormatter
     }()
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
                 SearchBarView(
-                    fieldFocused: $searchFocused,
-                    text: Binding(
+                    isSearchFieldFocused: $searchFocused,
+                    searchText: Binding(
                         get: { container.state.searchText },
                         set: { container.send(.searchTextChanged($0)) }
                     ),
@@ -46,12 +46,12 @@ struct SearchView: View {
             .navigationBarTitleDisplayMode(
                 container.state.showsLargeNavigationTitle ? .large : .inline
             )
-            .onChange(of: searchFocused) { _, newValue in
-                container.send(.searchFieldFocused(newValue))
+            .onChange(of: searchFocused) { _, isSearchFieldFocused in
+                container.send(.searchFieldFocused(isSearchFieldFocused))
             }
-            .onChange(of: container.state.searchFieldFocused) { _, newValue in
-                if newValue != searchFocused {
-                    searchFocused = newValue
+            .onChange(of: container.state.searchFieldFocused) { _, isSearchFieldFocused in
+                if isSearchFieldFocused != searchFocused {
+                    searchFocused = isSearchFieldFocused
                 }
             }
             .onAppear {
@@ -62,14 +62,14 @@ struct SearchView: View {
 
     @ViewBuilder
     private var content: some View {
-        let state = container.state
+        let searchState = container.state
 
-        if state.showsResultsSection {
-            resultsContent(state: state)
-        } else if state.showsAutocomplete {
-            autocompleteList(state: state)
-        } else if state.showsRecentSection {
-            recentSection(state: state)
+        if searchState.showsResultsSection {
+            resultsContent(state: searchState)
+        } else if searchState.showsAutocomplete {
+            autocompleteList(state: searchState)
+        } else if searchState.showsRecentSection {
+            recentSection(state: searchState)
         } else {
             Spacer(minLength: 0)
         }
@@ -111,15 +111,15 @@ struct SearchView: View {
     @ViewBuilder
     private func autocompleteList(state: SearchState) -> some View {
         List {
-            ForEach(state.autocompleteCandidates) { item in
+            ForEach(state.autocompleteCandidates) { recentSearchItem in
                 Button {
-                    container.send(.tapAutocompleteSuggestion(item))
+                    container.send(.tapAutocompleteSuggestion(recentSearchItem))
                 } label: {
                     HStack {
-                        Text(item.query)
+                        Text(recentSearchItem.query)
                             .foregroundStyle(.primary)
                         Spacer()
-                        Text(Self.shortDateFormatter.string(from: item.searchedAt))
+                        Text(Self.shortDateFormatter.string(from: recentSearchItem.searchedAt))
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
@@ -155,19 +155,19 @@ struct SearchView: View {
                     .padding(.horizontal, 16)
                     .padding(.bottom, 16)
             } else {
-                ForEach(state.recentSearches) { item in
+                ForEach(state.recentSearches) { recentSearchItem in
                     HStack {
                         Button {
-                            container.send(.tapRecentSearch(item))
+                            container.send(.tapRecentSearch(recentSearchItem))
                         } label: {
-                            Text(item.query)
+                            Text(recentSearchItem.query)
                                 .foregroundStyle(.primary)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
                         .buttonStyle(.plain)
 
                         Button {
-                            container.send(.removeRecentSearch(item.id))
+                            container.send(.removeRecentSearch(recentSearchItem.id))
                         } label: {
                             Image(systemName: "xmark")
                                 .font(.caption.weight(.semibold))
@@ -190,9 +190,9 @@ struct SearchView: View {
     }
 
     private func countLabel(_ total: Int) -> String {
-        let n = NSNumber(value: total)
-        let formatted = Self.countFormatter.string(from: n) ?? "\(total)"
-        return "\(formatted)개 저장소"
+        let totalCountAsNumber = NSNumber(value: total)
+        let formattedCount = Self.countFormatter.string(from: totalCountAsNumber) ?? "\(total)"
+        return "\(formattedCount)개 저장소"
     }
 }
 

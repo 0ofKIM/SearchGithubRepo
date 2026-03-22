@@ -6,8 +6,8 @@
 import SwiftUI
 
 struct SearchBarView: View {
-    @FocusState.Binding var fieldFocused: Bool
-    @Binding var text: String
+    @FocusState.Binding var isSearchFieldFocused: Bool
+    @Binding var searchText: String
     var onSubmit: () -> Void
     var onClear: () -> Void
     var onCancel: () -> Void
@@ -18,13 +18,13 @@ struct SearchBarView: View {
                 Image(systemName: "magnifyingglass")
                     .foregroundStyle(.secondary)
 
-                TextField("저장소 검색", text: $text)
+                TextField("저장소 검색", text: $searchText)
                     .textFieldStyle(.plain)
                     .submitLabel(.search)
-                    .focused($fieldFocused)
+                    .focused($isSearchFieldFocused)
                     .onSubmit(onSubmit)
 
-                if !text.isEmpty {
+                if !searchText.isEmpty {
                     Button(action: onClear) {
                         Image(systemName: "xmark.circle.fill")
                             .foregroundStyle(.secondary)
@@ -37,7 +37,7 @@ struct SearchBarView: View {
             .background(Color(.systemGray6))
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
 
-            if fieldFocused {
+            if isSearchFieldFocused {
                 Button("취소", action: onCancel)
                     .foregroundStyle(Color.purple)
                     .buttonStyle(.plain)

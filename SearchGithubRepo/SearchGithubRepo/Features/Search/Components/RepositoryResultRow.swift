@@ -16,8 +16,8 @@ struct RepositoryResultRow: View {
                     Color(.systemGray5)
                         .frame(width: 44, height: 44)
                         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                case .success(let image):
-                    image
+                case .success(let loadedImage):
+                    loadedImage
                         .resizable()
                         .scaledToFill()
                         .frame(width: 44, height: 44)

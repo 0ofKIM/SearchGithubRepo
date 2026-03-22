@@ -31,10 +31,10 @@ struct SearchState: Equatable {
     )
 
     var autocompleteCandidates: [RecentSearchItem] {
-        let trimmed = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return [] }
+        let trimmedSearchText = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedSearchText.isEmpty else { return [] }
         return recentSearches.filter {
-            $0.query.localizedStandardContains(trimmed)
+            $0.query.localizedStandardContains(trimmedSearchText)
         }
     }
 
@@ -95,31 +95,31 @@ final class SearchContainer: ObservableObject {
 
     func send(_ intent: SearchIntent) {
         switch intent {
-        case .searchTextChanged(let text):
-            state.searchText = text
-            if let active = state.activeSearchQuery, text != active {
+        case .searchTextChanged(let newSearchText):
+            state.searchText = newSearchText
+            if let activeSearchQuery = state.activeSearchQuery, newSearchText != activeSearchQuery {
                 state.activeSearchQuery = nil
                 state.repositories = []
                 state.totalCount = 0
                 state.errorMessage = nil
             }
 
-        case .searchFieldFocused(let focused):
-            if state.searchFieldFocused != focused {
-                state.searchFieldFocused = focused
+        case .searchFieldFocused(let isSearchFieldFocused):
+            if state.searchFieldFocused != isSearchFieldFocused {
+                state.searchFieldFocused = isSearchFieldFocused
             }
 
         case .submitSearch:
-            let trimmed = state.searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard !trimmed.isEmpty else { return }
+            let trimmedSearchText = state.searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmedSearchText.isEmpty else { return }
             searchTask?.cancel()
-            state.activeSearchQuery = trimmed
+            state.activeSearchQuery = trimmedSearchText
             state.searchFieldFocused = false
             state.errorMessage = nil
-            recentSearchStorage.add(query: trimmed)
+            recentSearchStorage.add(query: trimmedSearchText)
             state.recentSearches = recentSearchStorage.load()
             searchTask = Task { [weak self] in
-                await self?.performSearch(query: trimmed)
+                await self?.performSearch(query: trimmedSearchText)
             }
 
         case .tapCancel:
@@ -132,24 +132,24 @@ final class SearchContainer: ObservableObject {
             state.totalCount = 0
             state.errorMessage = nil
 
-        case .tapRecentSearch(let item):
-            state.searchText = item.query
+        case .tapRecentSearch(let recentSearchItem):
+            state.searchText = recentSearchItem.query
             state.activeSearchQuery = nil
             state.repositories = []
             state.totalCount = 0
             state.errorMessage = nil
             state.searchFieldFocused = true
 
-        case .tapAutocompleteSuggestion(let item):
-            state.searchText = item.query
+        case .tapAutocompleteSuggestion(let recentSearchItem):
+            state.searchText = recentSearchItem.query
             state.activeSearchQuery = nil
             state.repositories = []
             state.totalCount = 0
             state.errorMessage = nil
             state.searchFieldFocused = true
 
-        case .removeRecentSearch(let id):
-            recentSearchStorage.remove(id: id)
+        case .removeRecentSearch(let recentSearchItemID):
+            recentSearchStorage.remove(recentSearchItemID: recentSearchItemID)
             state.recentSearches = recentSearchStorage.load()
 
         case .clearAllRecentSearches:
@@ -158,22 +158,22 @@ final class SearchContainer: ObservableObject {
         }
     }
 
-    private func performSearch(query: String) async {
+    private func performSearch(query searchQuery: String) async {
         state.isLoadingResults = true
         defer { state.isLoadingResults = false }
 
         do {
-            let response = try await gitHubSearchService.searchRepositories(query: query, page: 1)
+            let searchResponse = try await gitHubSearchService.searchRepositories(query: searchQuery, page: 1)
             guard !Task.isCancelled else { return }
-            guard state.activeSearchQuery == query else { return }
-            state.repositories = response.items
-            state.totalCount = response.totalCount
+            guard state.activeSearchQuery == searchQuery else { return }
+            state.repositories = searchResponse.items
+            state.totalCount = searchResponse.totalCount
             state.errorMessage = nil
         } catch is CancellationError {
             return
         } catch {
             guard !Task.isCancelled else { return }
-            guard state.activeSearchQuery == query else { return }
+            guard state.activeSearchQuery == searchQuery else { return }
             state.repositories = []
             state.totalCount = 0
             state.errorMessage = error.localizedDescription
