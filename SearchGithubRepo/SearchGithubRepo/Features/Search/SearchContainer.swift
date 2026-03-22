@@ -6,6 +6,19 @@
 import Combine
 import Foundation
 
+// MARK: - Web sheet
+
+struct WebPresentation: Identifiable, Equatable {
+    let id: String
+    let url: URL
+
+    init?(repository: Repository) {
+        guard let url = URL(string: repository.htmlURL) else { return nil }
+        self.url = url
+        id = repository.htmlURL
+    }
+}
+
 // MARK: - State
 
 struct SearchState: Equatable {
@@ -17,7 +30,10 @@ struct SearchState: Equatable {
     var repositories: [Repository]
     var totalCount: Int
     var isLoadingResults: Bool
+    var isPaginating: Bool
+    var hasMorePages: Bool
     var errorMessage: String?
+    var presentedRepositoryWeb: WebPresentation?
 
     static let initial = SearchState(
         searchText: "",
@@ -27,7 +43,10 @@ struct SearchState: Equatable {
         repositories: [],
         totalCount: 0,
         isLoadingResults: false,
-        errorMessage: nil
+        isPaginating: false,
+        hasMorePages: false,
+        errorMessage: nil,
+        presentedRepositoryWeb: nil
     )
 
     var autocompleteCandidates: [RecentSearchItem] {
@@ -66,6 +85,9 @@ enum SearchIntent: Equatable {
     case tapAutocompleteSuggestion(RecentSearchItem)
     case removeRecentSearch(UUID)
     case clearAllRecentSearches
+    case tapRepository(Repository)
+    case dismissWebSheet
+    case prefetchNextPage
 }
 
 // MARK: - Container
@@ -77,6 +99,9 @@ final class SearchContainer: ObservableObject {
     private let recentSearchStorage: RecentSearchStorage
     private let gitHubSearchService: GitHubSearchService
     private var searchTask: Task<Void, Never>?
+    private var paginationTask: Task<Void, Never>?
+    /// 다음에 요청할 GitHub `page` (1-based). 1페이지는 `performSearch`에서만 호출.
+    private var nextPageToLoad: Int = 2
 
     init(
         recentSearchStorage: RecentSearchStorage = RecentSearchStorage(),
@@ -98,6 +123,9 @@ final class SearchContainer: ObservableObject {
                 state.repositories = []
                 state.totalCount = 0
                 state.errorMessage = nil
+                state.hasMorePages = false
+                state.presentedRepositoryWeb = nil
+                paginationTask?.cancel()
             }
 
         case .searchFieldFocused(let isSearchFieldFocused):
@@ -109,9 +137,13 @@ final class SearchContainer: ObservableObject {
             let trimmedSearchText = state.searchText.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !trimmedSearchText.isEmpty else { return }
             searchTask?.cancel()
+            paginationTask?.cancel()
             state.activeSearchQuery = trimmedSearchText
             state.searchFieldFocused = false
             state.errorMessage = nil
+            state.presentedRepositoryWeb = nil
+            state.hasMorePages = false
+            nextPageToLoad = 2
             recentSearchStorage.add(query: trimmedSearchText)
             state.recentSearches = recentSearchStorage.load()
             searchTask = Task { [weak self] in
@@ -127,6 +159,9 @@ final class SearchContainer: ObservableObject {
             state.repositories = []
             state.totalCount = 0
             state.errorMessage = nil
+            state.hasMorePages = false
+            state.presentedRepositoryWeb = nil
+            paginationTask?.cancel()
 
         case .tapRecentSearch(let recentSearchItem):
             state.searchText = recentSearchItem.query
@@ -134,7 +169,10 @@ final class SearchContainer: ObservableObject {
             state.repositories = []
             state.totalCount = 0
             state.errorMessage = nil
+            state.hasMorePages = false
+            state.presentedRepositoryWeb = nil
             state.searchFieldFocused = true
+            paginationTask?.cancel()
 
         case .tapAutocompleteSuggestion(let recentSearchItem):
             state.searchText = recentSearchItem.query
@@ -142,7 +180,10 @@ final class SearchContainer: ObservableObject {
             state.repositories = []
             state.totalCount = 0
             state.errorMessage = nil
+            state.hasMorePages = false
+            state.presentedRepositoryWeb = nil
             state.searchFieldFocused = true
+            paginationTask?.cancel()
 
         case .removeRecentSearch(let recentSearchItemID):
             recentSearchStorage.remove(recentSearchItemID: recentSearchItemID)
@@ -151,6 +192,25 @@ final class SearchContainer: ObservableObject {
         case .clearAllRecentSearches:
             recentSearchStorage.removeAll()
             state.recentSearches = []
+
+        case .tapRepository(let repository):
+            if let presentation = WebPresentation(repository: repository) {
+                state.presentedRepositoryWeb = presentation
+            }
+
+        case .dismissWebSheet:
+            state.presentedRepositoryWeb = nil
+
+        case .prefetchNextPage:
+            guard state.activeSearchQuery != nil else { return }
+            guard state.hasMorePages, !state.isLoadingResults else { return }
+            guard !state.isPaginating else { return }
+            state.isPaginating = true
+            paginationTask?.cancel()
+            paginationTask = Task { [weak self] in
+                defer { self?.state.isPaginating = false }
+                await self?.loadNextPage()
+            }
         }
     }
 
@@ -165,6 +225,9 @@ final class SearchContainer: ObservableObject {
             state.repositories = searchResponse.items
             state.totalCount = searchResponse.totalCount
             state.errorMessage = nil
+            state.hasMorePages = !searchResponse.items.isEmpty
+                && state.repositories.count < state.totalCount
+            nextPageToLoad = 2
         } catch is CancellationError {
             return
         } catch {
@@ -172,7 +235,32 @@ final class SearchContainer: ObservableObject {
             guard state.activeSearchQuery == searchQuery else { return }
             state.repositories = []
             state.totalCount = 0
+            state.hasMorePages = false
             state.errorMessage = error.localizedDescription
+        }
+    }
+
+    private func loadNextPage() async {
+        guard let activeSearchQuery = state.activeSearchQuery else { return }
+        let page = nextPageToLoad
+
+        do {
+            let searchResponse = try await gitHubSearchService.searchRepositories(
+                query: activeSearchQuery,
+                page: page
+            )
+            guard !Task.isCancelled else { return }
+            guard state.activeSearchQuery == activeSearchQuery else { return }
+            state.repositories.append(contentsOf: searchResponse.items)
+            state.hasMorePages = !searchResponse.items.isEmpty
+                && state.repositories.count < state.totalCount
+            nextPageToLoad = page + 1
+        } catch is CancellationError {
+            return
+        } catch {
+            guard !Task.isCancelled else { return }
+            guard state.activeSearchQuery == activeSearchQuery else { return }
+            state.hasMorePages = false
         }
     }
 }

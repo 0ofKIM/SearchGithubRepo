@@ -65,7 +65,32 @@ struct SearchView: View {
             .onAppear {
                 searchFocused = container.state.searchFieldFocused
             }
+            .sheet(item: webSheetBinding) { presentation in
+                NavigationStack {
+                    RepositoryWebView(url: presentation.url)
+                        .navigationTitle("저장소")
+                        .navigationBarTitleDisplayMode(.inline)
+                        .toolbar {
+                            ToolbarItem(placement: .topBarTrailing) {
+                                Button("닫기") {
+                                    container.send(.dismissWebSheet)
+                                }
+                            }
+                        }
+                }
+            }
         }
+    }
+
+    private var webSheetBinding: Binding<WebPresentation?> {
+        Binding(
+            get: { container.state.presentedRepositoryWeb },
+            set: { newValue in
+                if newValue == nil {
+                    container.send(.dismissWebSheet)
+                }
+            }
+        )
     }
 
     @ViewBuilder
@@ -101,14 +126,37 @@ struct SearchView: View {
             } else {
                 List {
                     Section {
-                        ForEach(state.repositories) { repository in
-                            RepositoryResultRow(repository: repository)
+                        ForEach(Array(state.repositories.enumerated()), id: \.element.id) { index, repository in
+                            Button {
+                                container.send(.tapRepository(repository))
+                            } label: {
+                                RepositoryResultRow(repository: repository)
+                            }
+                            .buttonStyle(.plain)
+                            .onAppear {
+                                let endPointIndex = max(0, state.repositories.count-10)
+                                if index == endPointIndex {
+                                    container.send(.prefetchNextPage)
+                                }
+                            }
                         }
                     } header: {
                         Text(countLabel(state.totalCount))
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                             .textCase(nil)
+                    } footer: {
+                        if state.isPaginating {
+                            HStack {
+                                Spacer()
+                                Image(systemName: "progress.indicator")
+                                    .font(.title2)
+                                    .foregroundStyle(.secondary)
+                                    .symbolEffect(.rotate, options: .repeating, isActive: true)
+                                Spacer()
+                            }
+                            .padding(.vertical, 12)
+                        }
                     }
                 }
                 .listStyle(.plain)
