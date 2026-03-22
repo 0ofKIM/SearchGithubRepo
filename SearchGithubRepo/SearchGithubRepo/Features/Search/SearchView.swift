@@ -41,8 +41,9 @@ struct SearchView: View {
                 .background(Color(.systemBackground))
 
                 content
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .navigationTitle("Search")
+            .navigationTitle(searchFocused ? "" : "Search")
             .navigationBarTitleDisplayMode(
                 container.state.showsLargeNavigationTitle ? .large : .inline
             )
@@ -154,37 +155,42 @@ struct SearchView: View {
                     .foregroundStyle(.secondary)
                     .padding(.horizontal, 16)
                     .padding(.bottom, 16)
+
+                Divider()
+                    .padding(.top, 8)
+
+                Spacer(minLength: 0)
             } else {
-                ForEach(state.recentSearches) { recentSearchItem in
-                    HStack {
-                        Button {
-                            container.send(.tapRecentSearch(recentSearchItem))
-                        } label: {
-                            Text(recentSearchItem.query)
-                                .foregroundStyle(.primary)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                        .buttonStyle(.plain)
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 0) {
+                        ForEach(state.recentSearches) { recentSearchItem in
+                            HStack {
+                                Button {
+                                    container.send(.tapRecentSearch(recentSearchItem))
+                                } label: {
+                                    Text(recentSearchItem.query)
+                                        .foregroundStyle(.primary)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                                .buttonStyle(.plain)
 
-                        Button {
-                            container.send(.removeRecentSearch(recentSearchItem.id))
-                        } label: {
-                            Image(systemName: "xmark")
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(.secondary)
-                                .padding(8)
+                                Button {
+                                    container.send(.removeRecentSearch(recentSearchItem.id))
+                                } label: {
+                                    Image(systemName: "xmark")
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(.secondary)
+                                        .padding(8)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 10)
                         }
-                        .buttonStyle(.plain)
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 10)
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-
-            Divider()
-                .padding(.top, 8)
-
-            Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
