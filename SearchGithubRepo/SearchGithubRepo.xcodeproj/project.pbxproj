@@ -18,6 +18,7 @@
 		529D09542F6FD33A0039C770 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529D09452F6FD33A0039C770 /* SearchView.swift */; };
 		529D09552F6FD33A0039C770 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529D09492F6FD33A0039C770 /* ContentView.swift */; };
 		529D09562F6FD33A0039C770 /* SearchGithubRepoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529D094A2F6FD33A0039C770 /* SearchGithubRepoApp.swift */; };
+		529D09572F6FD33A0039C770 /* RepositoryWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529D09592F6FD33A0039C770 /* RepositoryWebView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,6 +34,7 @@
 		529D09482F6FD33A0039C770 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		529D09492F6FD33A0039C770 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		529D094A2F6FD33A0039C770 /* SearchGithubRepoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchGithubRepoApp.swift; sourceTree = "<group>"; };
+		529D09592F6FD33A0039C770 /* RepositoryWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryWebView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +112,7 @@
 			isa = PBXGroup;
 			children = (
 				529D09432F6FD33A0039C770 /* Components */,
+				529D09592F6FD33A0039C770 /* RepositoryWebView.swift */,
 				529D09442F6FD33A0039C770 /* SearchContainer.swift */,
 				529D09452F6FD33A0039C770 /* SearchView.swift */,
 			);
@@ -216,6 +219,7 @@
 				529D09522F6FD33A0039C770 /* SearchBarView.swift in Sources */,
 				529D09532F6FD33A0039C770 /* SearchContainer.swift in Sources */,
 				529D09542F6FD33A0039C770 /* SearchView.swift in Sources */,
+				529D09572F6FD33A0039C770 /* RepositoryWebView.swift in Sources */,
 				529D09552F6FD33A0039C770 /* ContentView.swift in Sources */,
 				529D09562F6FD33A0039C770 /* SearchGithubRepoApp.swift in Sources */,
 			);
