@@ -25,8 +25,7 @@ struct RecentSearchStorage: Sendable {
 
     func save(_ items: [RecentSearchItem]) {
         let sortedItems = items.sorted { $0.searchedAt > $1.searchedAt }
-        let limitedItems = Array(sortedItems.prefix(10))
-        guard let encodedData = try? JSONEncoder().encode(limitedItems) else { return }
+        guard let encodedData = try? JSONEncoder().encode(sortedItems) else { return }
         userDefaults.set(encodedData, forKey: userDefaultsKey)
     }
 
