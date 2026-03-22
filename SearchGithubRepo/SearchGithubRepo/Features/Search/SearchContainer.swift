@@ -26,6 +26,7 @@ struct SearchState: Equatable {
     var searchFieldFocused: Bool
     /// 검색 실행 후 결과 영역에 표시 중인 쿼리. `nil`이면 최근 검색/자동완성 영역.
     var activeSearchQuery: String?
+    /// 저장소에 보관된 전체 최근 검색(날짜 내림차순). UI 목록은 `recentSearchesDisplayed`만 사용.
     var recentSearches: [RecentSearchItem]
     var repositories: [Repository]
     var totalCount: Int
@@ -48,6 +49,11 @@ struct SearchState: Equatable {
         errorMessage: nil,
         presentedRepositoryWeb: nil
     )
+
+    /// 최근 검색 목록에 노출할 항목(최대 10개). 삭제 시 그 다음 우선순위 항목이 채워짐.
+    var recentSearchesDisplayed: [RecentSearchItem] {
+        Array(recentSearches.prefix(10))
+    }
 
     var autocompleteCandidates: [RecentSearchItem] {
         let trimmedSearchText = searchText.trimmingCharacters(in: .whitespacesAndNewlines)

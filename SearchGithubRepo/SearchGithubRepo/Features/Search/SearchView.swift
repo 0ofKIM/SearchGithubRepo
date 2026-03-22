@@ -218,7 +218,7 @@ struct SearchView: View {
             } else {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 0) {
-                        ForEach(state.recentSearches) { recentSearchItem in
+                        ForEach(state.recentSearchesDisplayed) { recentSearchItem in
                             HStack {
                                 Button {
                                     container.send(.tapRecentSearch(recentSearchItem))
