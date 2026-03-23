@@ -19,6 +19,9 @@
 		529D09562F6FD33A0039C770 /* SearchGithubRepoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529D094A2F6FD33A0039C770 /* SearchGithubRepoApp.swift */; };
 		529D09572F6FD33A0039C770 /* RepositoryWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529D09592F6FD33A0039C770 /* RepositoryWebView.swift */; };
 		529D09792F711D8E0039C770 /* SearchRepositoriesResponseDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529D09782F711D830039C770 /* SearchRepositoriesResponseDTO.swift */; };
+		529D097C2F7171FF0039C770 /* ResultsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529D097B2F7171F80039C770 /* ResultsListView.swift */; };
+		529D097E2F7172370039C770 /* AutoCompleteListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529D097D2F7172360039C770 /* AutoCompleteListView.swift */; };
+		529D09802F71727E0039C770 /* RecentSearchSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529D097F2F71727D0039C770 /* RecentSearchSectionView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +38,9 @@
 		529D094A2F6FD33A0039C770 /* SearchGithubRepoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchGithubRepoApp.swift; sourceTree = "<group>"; };
 		529D09592F6FD33A0039C770 /* RepositoryWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryWebView.swift; sourceTree = "<group>"; };
 		529D09782F711D830039C770 /* SearchRepositoriesResponseDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchRepositoriesResponseDTO.swift; sourceTree = "<group>"; };
+		529D097B2F7171F80039C770 /* ResultsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsListView.swift; sourceTree = "<group>"; };
+		529D097D2F7172360039C770 /* AutoCompleteListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoCompleteListView.swift; sourceTree = "<group>"; };
+		529D097F2F71727D0039C770 /* RecentSearchSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentSearchSectionView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,8 +108,11 @@
 		529D09432F6FD33A0039C770 /* Components */ = {
 			isa = PBXGroup;
 			children = (
-				529D09412F6FD33A0039C770 /* RepositoryResultRow.swift */,
 				529D09422F6FD33A0039C770 /* SearchBarView.swift */,
+				529D097F2F71727D0039C770 /* RecentSearchSectionView.swift */,
+				529D097D2F7172360039C770 /* AutoCompleteListView.swift */,
+				529D097B2F7171F80039C770 /* ResultsListView.swift */,
+				529D09412F6FD33A0039C770 /* RepositoryResultRow.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -112,9 +121,9 @@
 			isa = PBXGroup;
 			children = (
 				529D09432F6FD33A0039C770 /* Components */,
+				529D09592F6FD33A0039C770 /* RepositoryWebView.swift */,
 				529D09452F6FD33A0039C770 /* SearchView.swift */,
 				529D09442F6FD33A0039C770 /* SearchContainer.swift */,
-				529D09592F6FD33A0039C770 /* RepositoryWebView.swift */,
 			);
 			path = Search;
 			sourceTree = "<group>";
@@ -220,6 +229,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				529D094D2F6FD33A0039C770 /* RecentSearchItem.swift in Sources */,
+				529D097C2F7171FF0039C770 /* ResultsListView.swift in Sources */,
+				529D09802F71727E0039C770 /* RecentSearchSectionView.swift in Sources */,
 				529D094F2F6FD33A0039C770 /* GitHubSearchService.swift in Sources */,
 				529D09502F6FD33A0039C770 /* RecentSearchStorage.swift in Sources */,
 				529D09512F6FD33A0039C770 /* RepositoryResultRow.swift in Sources */,
@@ -228,6 +239,7 @@
 				529D09532F6FD33A0039C770 /* SearchContainer.swift in Sources */,
 				529D09542F6FD33A0039C770 /* SearchView.swift in Sources */,
 				529D09572F6FD33A0039C770 /* RepositoryWebView.swift in Sources */,
+				529D097E2F7172370039C770 /* AutoCompleteListView.swift in Sources */,
 				529D09552F6FD33A0039C770 /* ContentView.swift in Sources */,
 				529D09562F6FD33A0039C770 /* SearchGithubRepoApp.swift in Sources */,
 			);

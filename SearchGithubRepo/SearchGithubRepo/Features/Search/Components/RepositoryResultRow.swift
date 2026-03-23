@@ -36,6 +36,7 @@ struct RepositoryResultRow: View {
                 Text(repository.name)
                     .font(.body.weight(.semibold))
                     .foregroundStyle(.primary)
+                
                 Text(repository.owner.login)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
