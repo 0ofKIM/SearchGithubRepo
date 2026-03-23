@@ -22,6 +22,7 @@
 		529D097C2F7171FF0039C770 /* ResultsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529D097B2F7171F80039C770 /* ResultsListView.swift */; };
 		529D097E2F7172370039C770 /* AutoCompleteListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529D097D2F7172360039C770 /* AutoCompleteListView.swift */; };
 		529D09802F71727E0039C770 /* RecentSearchSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529D097F2F71727D0039C770 /* RecentSearchSectionView.swift */; };
+		529D09822F7179A30039C770 /* WebPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529D09812F7179A20039C770 /* WebPresentation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 		529D097B2F7171F80039C770 /* ResultsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsListView.swift; sourceTree = "<group>"; };
 		529D097D2F7172360039C770 /* AutoCompleteListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoCompleteListView.swift; sourceTree = "<group>"; };
 		529D097F2F71727D0039C770 /* RecentSearchSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentSearchSectionView.swift; sourceTree = "<group>"; };
+		529D09812F7179A20039C770 /* WebPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebPresentation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +75,7 @@
 		529D093B2F6FD33A0039C770 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				529D09812F7179A20039C770 /* WebPresentation.swift */,
 				529D09392F6FD33A0039C770 /* RecentSearchItem.swift */,
 			);
 			path = Models;
@@ -232,6 +235,7 @@
 				529D097C2F7171FF0039C770 /* ResultsListView.swift in Sources */,
 				529D09802F71727E0039C770 /* RecentSearchSectionView.swift in Sources */,
 				529D094F2F6FD33A0039C770 /* GitHubSearchService.swift in Sources */,
+				529D09822F7179A30039C770 /* WebPresentation.swift in Sources */,
 				529D09502F6FD33A0039C770 /* RecentSearchStorage.swift in Sources */,
 				529D09512F6FD33A0039C770 /* RepositoryResultRow.swift in Sources */,
 				529D09522F6FD33A0039C770 /* SearchBarView.swift in Sources */,

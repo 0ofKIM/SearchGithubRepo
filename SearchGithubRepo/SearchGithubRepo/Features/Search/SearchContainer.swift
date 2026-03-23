@@ -6,21 +6,7 @@
 import Combine
 import Foundation
 
-// MARK: - Web sheet
-
-struct WebPresentation: Identifiable, Equatable {
-    let id: String
-    let url: URL
-
-    init?(repository: RepositoryDTO) {
-        guard let url = URL(string: repository.htmlURL) else { return nil }
-        self.url = url
-        id = repository.htmlURL
-    }
-}
-
 // MARK: - State
-
 struct SearchState: Equatable {
     var searchText: String
     var searchFieldFocused: Bool
@@ -73,7 +59,6 @@ struct SearchState: Equatable {
 }
 
 // MARK: - Intent
-
 enum SearchIntent: Equatable {
     case searchTextChanged(String)
     case searchFieldFocused(Bool)
@@ -89,7 +74,6 @@ enum SearchIntent: Equatable {
 }
 
 // MARK: - Container
-
 @MainActor
 final class SearchContainer: ObservableObject {
     @Published private(set) var state: SearchState
