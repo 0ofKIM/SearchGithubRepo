@@ -82,7 +82,6 @@ final class SearchContainer: ObservableObject {
     private let gitHubSearchService: GitHubSearchService
     private var searchTask: Task<Void, Never>?
     private var paginationTask: Task<Void, Never>?
-    /// 다음에 요청할 GitHub `page` (1-based). 1페이지는 `performSearch`에서만 호출.
     private var nextPageToLoad: Int = 2
     private var canPrefetchNextPage: Bool {
         state.activeSearchQuery != nil

@@ -23,7 +23,6 @@ struct SearchView: View {
         return numberFormatter
     }()
 
-    /// 네비 타이틀과 같이 `searchFocused` 기준으로 큰 타이틀(.large) 표시 여부를 맞춤.
     private var showsLargeNavigationTitle: Bool {
         !searchFocused
             && container.state.searchText.isEmpty
