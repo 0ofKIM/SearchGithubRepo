@@ -23,7 +23,6 @@ struct SearchView: View {
         return numberFormatter
     }()
 
-    /// 네비 타이틀과 같이 `searchFocused` 기준으로 큰 타이틀(.large) 표시 여부를 맞춤.
     private var showsLargeNavigationTitle: Bool {
         !searchFocused
             && container.state.searchText.isEmpty
@@ -98,159 +97,28 @@ struct SearchView: View {
         let searchState = container.state
 
         if searchState.showsResultsSection {
-            resultsContent(state: searchState)
+            ResultsListView(
+                state: searchState,
+                onTapRepository: { container.send(.tapRepository($0)) },
+                onPrefetchNextPage: { container.send(.prefetchNextPage) },
+                countLabelText: countLabel(searchState.totalCount)
+            )
         } else if searchState.showsAutocomplete {
-            autocompleteList(state: searchState)
+            AutoCompleteListView(
+                items: searchState.autocompleteCandidates,
+                formatDateText: { Self.shortDateFormatter.string(from: $0) },
+                onSelectRecentSearch: { container.send(.selectRecentSearch($0)) }
+            )
         } else if searchState.showsRecentSection {
-            recentSection(state: searchState)
+            RecentSearchSectionView(
+                recentSearches: searchState.recentSearches,
+                onSelectRecentSearch: { container.send(.selectRecentSearch($0)) },
+                onRemoveRecentSearch: { container.send(.removeRecentSearch($0)) },
+                onClearAllRecentSearches: { container.send(.clearAllRecentSearches) }
+            )
         } else {
             Spacer(minLength: 0)
         }
-    }
-
-    @ViewBuilder
-    private func resultsContent(state: SearchState) -> some View {
-        Group {
-            if state.isLoadingResults {
-                ProgressView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding(.top, 24)
-            } else if let message = state.errorMessage {
-                Text(message)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 24)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                    .padding(.top, 24)
-            } else {
-                List {
-                    Section {
-                        ForEach(Array(state.repositories.enumerated()), id: \.element.id) { index, repository in
-                            Button {
-                                container.send(.tapRepository(repository))
-                            } label: {
-                                RepositoryResultRow(repository: repository)
-                            }
-                            .buttonStyle(.plain)
-                            .onAppear {
-                                let endPointIndex = max(0, state.repositories.count-10)
-                                if index == endPointIndex {
-                                    container.send(.prefetchNextPage)
-                                }
-                            }
-                        }
-                    } header: {
-                        Text(countLabel(state.totalCount))
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .textCase(nil)
-                    } footer: {
-                        if state.isPaginating {
-                            HStack {
-                                Spacer()
-                                Image(systemName: "progress.indicator")
-                                    .font(.title2)
-                                    .foregroundStyle(.secondary)
-                                    .symbolEffect(.rotate, options: .repeating, isActive: true)
-                                Spacer()
-                            }
-                            .padding(.vertical, 12)
-                        }
-                    }
-                }
-                .listStyle(.plain)
-            }
-        }
-    }
-
-    @ViewBuilder
-    private func autocompleteList(state: SearchState) -> some View {
-        List {
-            ForEach(state.autocompleteCandidates) { recentSearchItem in
-                Button {
-                    container.send(.selectRecentSearch(recentSearchItem))
-                } label: {
-                    HStack {
-                        Text(recentSearchItem.query)
-                            .foregroundStyle(.primary)
-                        Spacer()
-                        Text(Self.shortDateFormatter.string(from: recentSearchItem.searchedAt))
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-            }
-        }
-        .listStyle(.plain)
-    }
-
-    @ViewBuilder
-    private func recentSection(state: SearchState) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("최근 검색")
-                .font(.headline)
-                .padding(.horizontal, 16)
-                .padding(.top, 16)
-                .padding(.bottom, 8)
-
-            if state.recentSearches.isEmpty {
-                Text("최근 검색 내역이 없습니다.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 16)
-
-                Divider()
-                    .padding(.top, 8)
-
-                Spacer(minLength: 0)
-            } else {
-                ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 0) {
-                        ForEach(state.recentSearchesDisplayed) { recentSearchItem in
-                            HStack {
-                                Button {
-                                    container.send(.selectRecentSearch(recentSearchItem))
-                                } label: {
-                                    Text(recentSearchItem.query)
-                                        .font(.body)
-                                        .foregroundStyle(.primary)
-                                }
-                                .buttonStyle(.plain)
-
-                                Button {
-                                    container.send(.removeRecentSearch(recentSearchItem.id))
-                                } label: {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .font(.body.weight(.semibold))
-                                        .foregroundStyle(.secondary)
-                                        .padding(8)
-                                }
-                                .buttonStyle(.plain)
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 5)
-                        }
-                        
-                        if !state.recentSearches.isEmpty {
-                            Button("전체삭제") {
-                                container.send(.clearAllRecentSearches)
-                            }
-                            .font(.subheadline)
-                            .foregroundStyle(Color.pink)
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 10)
-                        }
-                        
-                        Divider()
-                    }
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
     private func countLabel(_ total: Int) -> String {

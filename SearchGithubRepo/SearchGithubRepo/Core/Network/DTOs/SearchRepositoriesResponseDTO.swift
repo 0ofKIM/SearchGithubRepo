@@ -1,17 +1,17 @@
 //
-//  Repository.swift
+//  SearchRepositoriesResponseDTO.swift
 //  SearchGithubRepo
 //
 
 import Foundation
 
-struct Repository: Identifiable, Equatable, Codable {
+struct RepositoryDTO: Identifiable, Equatable, Codable {
     let id: Int64
     let name: String
     let htmlURL: String
-    let owner: Owner
+    let owner: OwnerDTO
 
-    struct Owner: Equatable, Codable {
+    struct OwnerDTO: Equatable, Codable {
         let login: String
         let avatarURL: String
 
@@ -29,9 +29,9 @@ struct Repository: Identifiable, Equatable, Codable {
     }
 }
 
-struct SearchRepositoriesResponse: Decodable {
+struct SearchRepositoriesResponseDTO: Decodable {
     let totalCount: Int
-    let items: [Repository]
+    let items: [RepositoryDTO]
 
     enum CodingKeys: String, CodingKey {
         case totalCount = "total_count"

@@ -6,7 +6,7 @@
 import SwiftUI
 
 struct RepositoryResultRow: View {
-    let repository: Repository
+    let repository: RepositoryDTO
 
     var body: some View {
         HStack(alignment: .center, spacing: 12) {
@@ -36,6 +36,7 @@ struct RepositoryResultRow: View {
                 Text(repository.name)
                     .font(.body.weight(.semibold))
                     .foregroundStyle(.primary)
+                
                 Text(repository.owner.login)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
