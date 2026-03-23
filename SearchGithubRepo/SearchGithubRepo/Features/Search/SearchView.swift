@@ -113,7 +113,6 @@ struct SearchView: View {
         } else if searchState.showsRecentSection {
             RecentSearchSectionView(
                 recentSearches: searchState.recentSearches,
-                recentSearchesDisplayed: searchState.recentSearchesDisplayed,
                 onSelectRecentSearch: { container.send(.selectRecentSearch($0)) },
                 onRemoveRecentSearch: { container.send(.removeRecentSearch($0)) },
                 onClearAllRecentSearches: { container.send(.clearAllRecentSearches) }
