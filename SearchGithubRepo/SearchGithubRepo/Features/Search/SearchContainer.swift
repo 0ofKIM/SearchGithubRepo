@@ -12,7 +12,7 @@ struct WebPresentation: Identifiable, Equatable {
     let id: String
     let url: URL
 
-    init?(repository: Repository) {
+    init?(repository: RepositoryDTO) {
         guard let url = URL(string: repository.htmlURL) else { return nil }
         self.url = url
         id = repository.htmlURL
@@ -28,7 +28,7 @@ struct SearchState: Equatable {
     var activeSearchQuery: String?
     /// 저장소에 보관된 전체 최근 검색(날짜 내림차순). UI 목록은 `recentSearchesDisplayed`만 사용.
     var recentSearches: [RecentSearchItem]
-    var repositories: [Repository]
+    var repositories: [RepositoryDTO]
     var totalCount: Int
     var isLoadingResults: Bool
     var isPaginating: Bool
@@ -90,7 +90,7 @@ enum SearchIntent: Equatable {
     case selectRecentSearch(RecentSearchItem)
     case removeRecentSearch(UUID)
     case clearAllRecentSearches
-    case tapRepository(Repository)
+    case tapRepository(RepositoryDTO)
     case dismissWebSheet
     case prefetchNextPage
 }

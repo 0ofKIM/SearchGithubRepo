@@ -32,8 +32,8 @@ actor GitHubSearchService {
         self.session = session
     }
 
-    func searchRepositories(query: String, page: Int) async throws -> SearchRepositoriesResponse {
-        var components = URLComponents(string: "https://api.github.com/search/repositories")
+    func searchRepositories(query: String, page: Int) async throws -> SearchRepositoriesResponseDTO {
+        let components = URLComponents(string: "https://api.github.com/search/repositories")
         guard var components else { throw GitHubSearchError.invalidURL }
         components.queryItems = [
             URLQueryItem(name: "q", value: query),
@@ -51,7 +51,7 @@ actor GitHubSearchService {
         }
 
         do {
-            return try JSONDecoder().decode(SearchRepositoriesResponse.self, from: responseData)
+            return try JSONDecoder().decode(SearchRepositoriesResponseDTO.self, from: responseData)
         } catch {
             throw GitHubSearchError.decoding(error)
         }
